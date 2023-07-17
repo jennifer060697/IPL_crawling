@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  mysql:
+    image: mysql:8.0.33
+    container_name: ipl_mysql
+    environment:
+      MYSQL_DATABASE: IPL_schedule
+      MYSQL_ROOT_PASSWORD: 1234
+      TZ: 'Asia.Seoul'
+    ports:
+      - "3306:3306"
+    command: # 명령어 실행
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+09:00
+    volumes:
+      - ./data/:/var/lib/mysql
+    networks:
+      - test_network
+
+  python:
+    container_name: ipl_python
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    networks:
+      - test_network
+    links:
+      - "mysql:ipl_mysql"
+
+networks:
+  test_network:
